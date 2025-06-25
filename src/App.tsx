@@ -567,7 +567,7 @@ const App: React.FC = () => {
   }, [isRunning, isGameOver, showPauseMenu, gameSpeed]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-100 relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-100 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-10 left-10 w-20 h-20 bg-pink-300 rounded-full blur-xl animate-pulse"></div>
