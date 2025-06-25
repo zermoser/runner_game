@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Play, Pause, RotateCcw, Volume2, Trophy, Star, Heart, Zap } from 'lucide-react';
+import { Play, Pause, Star, Heart, Zap } from 'lucide-react';
 
 interface Obstacle {
   x: number;
@@ -34,7 +34,7 @@ const App: React.FC = () => {
   });
   const [currentScore, setCurrentScore] = useState(0);
   const [showPauseMenu, setShowPauseMenu] = useState(false);
-  const [gameSpeed, setGameSpeed] = useState(1);
+  const gameSpeed = 1;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -70,7 +70,7 @@ const App: React.FC = () => {
     const tailSpeed = 0.008 * gameSpeed;
     const earSpeed = 0.005 * gameSpeed;
     const maxTailAngle = Math.PI / 4;
-    const maxEarAngle = Math.PI / 8;
+    const maxEarAngle = Math.PI / 32;
 
     let animationId: number;
     let obstacles: Obstacle[] = [];
@@ -277,15 +277,16 @@ const App: React.FC = () => {
       context.fillRect(x + w * 0.4, y + h * 0.5, w * 0.1, h * 0.3);
       context.fillRect(x + w * 0.6, y + h * 0.5, w * 0.1, h * 0.3);
 
-      // Cat ears with animation
+      // Cat ears with animation (สามเหลี่ยมหงาย)
       context.fillStyle = '#ff9800';
       context.save();
       context.translate(x + w * 0.55, y + h * 0.15);
       context.rotate(earAngle);
+      // วาดหูเป็นสามเหลี่ยมหงาย: apex อยู่ที่ (0, -12), ฐานอยู่ระหว่าง (-8,0) ถึง (8,0)
       context.beginPath();
-      context.moveTo(0, 0);
-      context.lineTo(-8, -12);
-      context.lineTo(8, -12);
+      context.moveTo(0, -12);
+      context.lineTo(-8, 0);
+      context.lineTo(8, 0);
       context.closePath();
       context.fill();
       context.restore();
@@ -294,22 +295,23 @@ const App: React.FC = () => {
       context.translate(x + w * 0.85, y + h * 0.15);
       context.rotate(-earAngle);
       context.beginPath();
-      context.moveTo(0, 0);
-      context.lineTo(-8, -12);
-      context.lineTo(8, -12);
+      context.moveTo(0, -12);
+      context.lineTo(-8, 0);
+      context.lineTo(8, 0);
       context.closePath();
       context.fill();
       context.restore();
 
-      // Inner ears
-      context.fillStyle = '#ffb74d';
+      // Cat ears with animation (สามเหลี่ยมหงาย)
+      context.fillStyle = '#ff9800';
       context.save();
       context.translate(x + w * 0.55, y + h * 0.15);
       context.rotate(earAngle);
+      // วาดหูเป็นสามเหลี่ยมหงาย: apex อยู่ที่ (0, -12), ฐานอยู่ระหว่าง (-8,0) ถึง (8,0)
       context.beginPath();
-      context.moveTo(0, 0);
-      context.lineTo(-4, -8);
-      context.lineTo(4, -8);
+      context.moveTo(0, -12);
+      context.lineTo(-8, 0);
+      context.lineTo(8, 0);
       context.closePath();
       context.fill();
       context.restore();
@@ -318,9 +320,9 @@ const App: React.FC = () => {
       context.translate(x + w * 0.85, y + h * 0.15);
       context.rotate(-earAngle);
       context.beginPath();
-      context.moveTo(0, 0);
-      context.lineTo(-4, -8);
-      context.lineTo(4, -8);
+      context.moveTo(0, -12);
+      context.lineTo(-8, 0);
+      context.lineTo(8, 0);
       context.closePath();
       context.fill();
       context.restore();
@@ -430,15 +432,10 @@ const App: React.FC = () => {
 
     function drawUI() {
       // Score display with cat theme
-      const scoreText = `${currentScore.toString().padStart(5, '0')}`;
-      const hiScoreText = `HI ${highestThisRun.current.toString().padStart(5, '0')}`;
-
       context.save();
       context.font = '16px monospace';
       context.textAlign = 'right';
       context.fillStyle = '#7b1fa2';
-      context.fillText(hiScoreText, baseWidth - 20, 25);
-      context.fillText(scoreText, baseWidth - 20, 45);
       context.restore();
     }
 
@@ -522,6 +519,7 @@ const App: React.FC = () => {
         nextObstacleDelay = randomDelay();
       }
 
+
       obstacles.forEach((obs, idx) => {
         drawObstacle(obs, deltaTime);
 
@@ -552,12 +550,15 @@ const App: React.FC = () => {
 
         if (obs.x + obs.width < 0) {
           obstacles.splice(idx, 1);
-          const newScore = currentScore + 1;
-          setCurrentScore(newScore);
-          if (newScore > highestThisRun.current) {
-            highestThisRun.current = newScore;
-          }
+          setCurrentScore(prev => {
+            const next = prev + 1;
+            if (next > highestThisRun.current) {
+              highestThisRun.current = next;
+            }
+            return next;
+          });
         }
+
       });
 
       // Dynamic speed increase
@@ -602,38 +603,21 @@ const App: React.FC = () => {
       </div>
 
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
-        {/* Enhanced Header */}
-        <div className="mb-6 sm:mb-8 text-center">
-          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-            <div className="animate-bounce">
-              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
-            </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
-              Cat Run
-            </h1>
-            <div className="animate-bounce delay-300">
-              <Star className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
-            </div>
-          </div>
-          <p className="text-purple-600 text-sm sm:text-base lg:text-lg font-medium max-w-md mx-auto leading-relaxed">
-            Help our adorable cat jump over obstacles and achieve the highest score! 🐾
-          </p>
+        {/* Minimal Header */}
+        <div className="mb-4 sm:mb-6 text-center">
+          <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent flex items-center justify-center gap-2 sm:gap-3">
+            <Heart className="w-5 h-5 sm:w-7 sm:h-7 text-pink-500 animate-bounce" />
+            Cat Run
+            <Star className="w-5 h-5 sm:w-7 sm:h-7 text-purple-500 animate-bounce delay-200" />
+          </h1>
         </div>
 
         {/* Score Display */}
-        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-6">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200">
-            <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-              <span className="text-purple-700 font-semibold text-sm sm:text-base">Score:</span>
-              <span className="text-xl sm:text-2xl font-bold text-purple-800 font-mono">{currentScore.toString().padStart(5, '0')}</span>
-            </div>
-          </div>
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
-              <span className="text-purple-700 font-semibold text-sm sm:text-base">Best:</span>
-              <span className="text-xl sm:text-2xl font-bold text-purple-800 font-mono">{highScore.toString().padStart(5, '0')}</span>
+        <div className="mb-4 sm:mb-6">
+          <div className="bg-gradient-to-r from-pink-300 to-purple-400 text-white px-6 py-4 rounded-3xl shadow-xl text-center">
+            <div className="flex items-center justify-center gap-3 text-xl sm:text-2xl font-bold font-mono">
+              <Zap className="w-6 h-6 text-white animate-pulse" />
+              Score: {currentScore.toString().padStart(5, '0')}
             </div>
           </div>
         </div>
@@ -675,104 +659,14 @@ const App: React.FC = () => {
         </div>
 
         {/* Enhanced Controls */}
-        <div className="mt-6 sm:mt-8 flex flex-col items-center gap-4 sm:gap-6 w-full max-w-4xl">
-          {/* Instructions */}
-          <div className="bg-white/70 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200 text-center">
-            <p className="text-purple-700 text-xs sm:text-sm font-medium">
-              <span className="hidden sm:inline">Press SPACE or CLICK to jump • ESC to pause</span>
-              <span className="sm:hidden">TAP the jump button or game area to play</span>
+        <div className="mt-6 sm:mt-8 flex flex-col items-center w-full max-w-3xl px-4 sm:px-0">
+          <div className="bg-white/60 backdrop-blur-md rounded-xl px-4 py-2 shadow-sm border border-gray-200 text-center w-full">
+            <p className="text-gray-700 text-sm sm:text-base font-medium tracking-tight">
+              Press <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs border">SPACE</kbd> or <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs border">CLICK</kbd> to jump &bull; <kbd className="px-1 py-0.5 bg-gray-100 rounded text-xs border">ESC</kbd> to pause
             </p>
           </div>
-
-          {/* Speed Controls */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-            <div className="flex items-center gap-2">
-              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-              <span className="text-purple-700 font-semibold text-sm sm:text-base">Speed:</span>
-            </div>
-            <div className="flex gap-2">
-              {[0.5, 1, 1.5].map((speed) => (
-                <button
-                  key={speed}
-                  onClick={() => setGameSpeed(speed)}
-                  className={`px-3 sm:px-4 py-2 rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
-                    gameSpeed === speed
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                      : 'bg-white/80 hover:bg-white text-purple-700 shadow-md hover:shadow-lg border border-purple-200'
-                  }`}
-                >
-                  {speed}x
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Enhanced Mobile Jump Button */}
-        <div className="mt-6 sm:mt-8 block sm:hidden w-full max-w-sm mx-auto">
-          <button
-            onTouchStart={(e) => {
-              e.preventDefault();
-              if (!isRunning && !showPauseMenu) {
-                setIsRunning(true);
-              } else if (!isGameOver && !showPauseMenu && isRunning) {
-                const canvas = canvasRef.current;
-                if (canvas) {
-                  canvas.click();
-                }
-              } else if (isGameOver) {
-                setIsRunning(true);
-              }
-            }}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-3xl font-bold text-lg shadow-xl border-2 border-white/30 transform active:scale-95 transition-all duration-300"
-          >
-            <div className="flex items-center justify-center gap-3">
-              {!isRunning && !isGameOver ? (
-                <>
-                  <Play className="w-6 h-6" />
-                  <span>Start Adventure</span>
-                </>
-              ) : isGameOver ? (
-                <>
-                  <RotateCcw className="w-6 h-6" />
-                  <span>Try Again</span>
-                </>
-              ) : (
-                <>
-                  <div className="w-6 h-6 text-2xl">⬆️</div>
-                  <span>Jump!</span>
-                </>
-              )}
-            </div>
-          </button>
-        </div>
-
-        {/* Game Tips */}
-        <div className="mt-8 sm:mt-12 bg-gradient-to-r from-purple-100/70 to-pink-100/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-200 max-w-2xl mx-auto">
-          <h3 className="text-lg sm:text-xl font-bold text-purple-800 mb-3 text-center flex items-center justify-center gap-2">
-            <Star className="w-5 h-5 text-yellow-500" />
-            Pro Tips
-            <Star className="w-5 h-5 text-yellow-500" />
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base text-purple-700">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span>Time your jumps perfectly</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-              <span>Speed increases over time</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span>Watch for obstacle patterns</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-              <span>Practice makes purr-fect!</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
