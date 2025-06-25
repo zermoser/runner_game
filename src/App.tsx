@@ -28,10 +28,6 @@ const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
-  const [highScore, setHighScore] = useState(() => {
-    const saved = sessionStorage.getItem('catHighScore');
-    return saved ? parseInt(saved) : 0;
-  });
   const [currentScore, setCurrentScore] = useState(0);
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const gameSpeed = 1;
@@ -54,7 +50,6 @@ const App: React.FC = () => {
     let nextObstacleDelay = randomDelay();
     let speed = 200 * gameSpeed;
     let particles: Particle[] = [];
-    const highestThisRun = { current: highScore };
 
     const cat = {
       x: 80,
@@ -142,7 +137,6 @@ const App: React.FC = () => {
       particles = [];
       initClouds();
       gameStartTimestamp = 0;
-      highestThisRun.current = highScore;
       tailPhase = 0;
       earPhase = 0;
       backgroundOffset = 0;
@@ -455,13 +449,9 @@ const App: React.FC = () => {
       context.fillText('Press SPACE or CLICK to restart', baseWidth / 2, baseHeight / 2 + 10);
       context.fillText(`Score: ${currentScore}`, baseWidth / 2, baseHeight / 2 + 40);
 
-      if (currentScore === highestThisRun.current && currentScore > 0) {
-        context.fillStyle = '#388e3c';
-        context.fillText('NEW HIGH SCORE! 🎉', baseWidth / 2, baseHeight / 2 + 70);
-      }
-
       context.restore();
     }
+
 
     function drawStartScreen() {
       drawBackground(16);
@@ -477,12 +467,6 @@ const App: React.FC = () => {
       context.fillStyle = '#9c27b0';
       context.font = '16px sans-serif';
       context.fillText('Press SPACE or CLICK to start', baseWidth / 2, baseHeight / 2 + 10);
-
-      if (highScore > 0) {
-        context.fillStyle = '#ba68c8';
-        context.font = '14px sans-serif';
-        context.fillText(`Best: ${highScore}`, baseWidth / 2, baseHeight / 2 + 40);
-      }
 
       context.restore();
     }
@@ -550,13 +534,7 @@ const App: React.FC = () => {
 
         if (obs.x + obs.width < 0) {
           obstacles.splice(idx, 1);
-          setCurrentScore(prev => {
-            const next = prev + 1;
-            if (next > highestThisRun.current) {
-              highestThisRun.current = next;
-            }
-            return next;
-          });
+          setCurrentScore(prev => prev + 1);
         }
 
       });
@@ -570,10 +548,6 @@ const App: React.FC = () => {
       if (!isGameOver) {
         animationId = requestAnimationFrame(gameLoop);
       } else {
-        if (highestThisRun.current > highScore) {
-          setHighScore(highestThisRun.current);
-          sessionStorage.setItem('catHighScore', highestThisRun.current.toString());
-        }
         drawGameOver();
       }
     }
@@ -590,7 +564,7 @@ const App: React.FC = () => {
       canvas.removeEventListener('mousedown', handleMouseDown);
       cancelAnimationFrame(animationId);
     };
-  }, [isRunning, isGameOver, highScore, showPauseMenu, gameSpeed]);
+  }, [isRunning, isGameOver, showPauseMenu, gameSpeed]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-100 relative overflow-hidden">
