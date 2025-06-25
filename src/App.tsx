@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { Play, Pause, RotateCcw, Volume2, Trophy, Star, Heart, Zap } from 'lucide-react';
 
 interface Obstacle {
   x: number;
@@ -591,102 +592,187 @@ const App: React.FC = () => {
   }, [isRunning, isGameOver, highScore, showPauseMenu, gameSpeed]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex flex-col items-center justify-center p-4">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-4xl font-bold text-purple-800 mb-2">🐱 Cat Run 🐱</h1>
-        <p className="text-purple-600">Help the cute cat jump over obstacles and run as far as possible!</p>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-pink-300 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute top-32 right-20 w-16 h-16 bg-purple-300 rounded-full blur-lg animate-bounce delay-1000"></div>
+        <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-indigo-300 rounded-full blur-xl animate-pulse delay-500"></div>
+        <div className="absolute bottom-32 right-1/3 w-12 h-12 bg-pink-400 rounded-full blur-lg animate-bounce delay-700"></div>
       </div>
 
-      {/* Game Canvas */}
-      <div className="relative bg-white rounded-lg shadow-xl overflow-hidden border-2 border-purple-200">
-        <canvas
-          ref={canvasRef}
-          width={800}
-          height={240}
-          className="block w-full max-w-4xl"
-        />
-
-        {/* Pause Menu */}
-        {showPauseMenu && (
-          <div className="absolute inset-0 bg-white/90 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-purple-800 mb-4">⏸️ Paused</h2>
-              <button
-                onClick={() => {
-                  setShowPauseMenu(false);
-                  setIsRunning(true);
-                }}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors"
-              >
-                Resume
-              </button>
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
+        {/* Enhanced Header */}
+        <div className="mb-6 sm:mb-8 text-center">
+          <div className="flex items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+            <div className="animate-bounce">
+              <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-pink-500" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-purple-800 bg-clip-text text-transparent">
+              Cat Run
+            </h1>
+            <div className="animate-bounce delay-300">
+              <Star className="w-6 h-6 sm:w-8 sm:h-8 text-purple-500" />
             </div>
           </div>
-        )}
-      </div>
+          <p className="text-purple-600 text-sm sm:text-base lg:text-lg font-medium max-w-md mx-auto leading-relaxed">
+            Help our adorable cat jump over obstacles and achieve the highest score! 🐾
+          </p>
+        </div>
 
-      {/* Controls */}
-      <div className="mt-6 flex flex-col sm:flex-row gap-4 items-center">
-        <div className="text-center text-purple-700 text-sm">
-          <div className="mb-2">
-            <span className="font-semibold">Score:</span> {currentScore} |
-            <span className="font-semibold"> Best:</span> {highScore}
+        {/* Score Display */}
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:gap-6">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
+              <span className="text-purple-700 font-semibold text-sm sm:text-base">Score:</span>
+              <span className="text-xl sm:text-2xl font-bold text-purple-800 font-mono">{currentScore.toString().padStart(5, '0')}</span>
+            </div>
           </div>
-          <div>SPACE or CLICK to jump • ESC to pause</div>
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+              <span className="text-purple-700 font-semibold text-sm sm:text-base">Best:</span>
+              <span className="text-xl sm:text-2xl font-bold text-purple-800 font-mono">{highScore.toString().padStart(5, '0')}</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => setGameSpeed(0.5)}
-            className={`px-3 py-1 rounded text-sm transition-colors ${gameSpeed === 0.5
-              ? 'bg-purple-600 text-white'
-              : 'bg-purple-200 hover:bg-purple-300 text-purple-700'
-              }`}
-          >
-            0.5x
-          </button>
-          <button
-            onClick={() => setGameSpeed(1)}
-            className={`px-3 py-1 rounded text-sm transition-colors ${gameSpeed === 1
-              ? 'bg-purple-600 text-white'
-              : 'bg-purple-200 hover:bg-purple-300 text-purple-700'
-              }`}
-          >
-            1x
-          </button>
-          <button
-            onClick={() => setGameSpeed(1.5)}
-            className={`px-3 py-1 rounded text-sm transition-colors ${gameSpeed === 1.5
-              ? 'bg-purple-600 text-white'
-              : 'bg-purple-200 hover:bg-purple-300 text-purple-700'
-              }`}
-          >
-            1.5x
-          </button>
-        </div>
-      </div>
+        {/* Game Canvas Container */}
+        <div className="relative bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border-2 border-purple-200 max-w-full">
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={240}
+              className="block w-full max-w-[800px] h-auto"
+              style={{ aspectRatio: '800/240' }}
+            />
 
-      {/* Mobile Jump Button */}
-      <div className="mt-4 sm:hidden">
-        <button
-          onTouchStart={(e) => {
-            e.preventDefault();
-            if (!isRunning && !showPauseMenu) {
-              setIsRunning(true);
-            } else if (!isGameOver && !showPauseMenu && isRunning) {
-              const canvas = canvasRef.current;
-              if (canvas) {
-                canvas.click();
+            {/* Enhanced Pause Menu */}
+            {showPauseMenu && (
+              <div className="absolute inset-0 bg-gradient-to-br from-white/95 to-purple-50/95 backdrop-blur-sm flex items-center justify-center">
+                <div className="text-center bg-white/90 rounded-3xl p-6 sm:p-8 shadow-xl border border-purple-200">
+                  <div className="flex items-center justify-center gap-2 mb-4">
+                    <Pause className="w-6 h-6 text-purple-600" />
+                    <h2 className="text-2xl sm:text-3xl font-bold text-purple-800">Game Paused</h2>
+                  </div>
+                  <p className="text-purple-600 mb-6 text-sm sm:text-base">Take a breath and continue when ready!</p>
+                  <button
+                    onClick={() => {
+                      setShowPauseMenu(false);
+                      setIsRunning(true);
+                    }}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6 sm:px-8 py-3 rounded-2xl transition-all duration-300 font-semibold flex items-center gap-2 mx-auto shadow-lg hover:shadow-xl transform hover:scale-105"
+                  >
+                    <Play className="w-5 h-5" />
+                    Resume Game
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Enhanced Controls */}
+        <div className="mt-6 sm:mt-8 flex flex-col items-center gap-4 sm:gap-6 w-full max-w-4xl">
+          {/* Instructions */}
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl px-4 sm:px-6 py-3 shadow-lg border border-purple-200 text-center">
+            <p className="text-purple-700 text-xs sm:text-sm font-medium">
+              <span className="hidden sm:inline">Press SPACE or CLICK to jump • ESC to pause</span>
+              <span className="sm:hidden">TAP the jump button or game area to play</span>
+            </p>
+          </div>
+
+          {/* Speed Controls */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-2">
+              <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+              <span className="text-purple-700 font-semibold text-sm sm:text-base">Speed:</span>
+            </div>
+            <div className="flex gap-2">
+              {[0.5, 1, 1.5].map((speed) => (
+                <button
+                  key={speed}
+                  onClick={() => setGameSpeed(speed)}
+                  className={`px-3 sm:px-4 py-2 rounded-xl text-sm sm:text-base font-semibold transition-all duration-300 transform hover:scale-105 ${
+                    gameSpeed === speed
+                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
+                      : 'bg-white/80 hover:bg-white text-purple-700 shadow-md hover:shadow-lg border border-purple-200'
+                  }`}
+                >
+                  {speed}x
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Mobile Jump Button */}
+        <div className="mt-6 sm:mt-8 block sm:hidden w-full max-w-sm mx-auto">
+          <button
+            onTouchStart={(e) => {
+              e.preventDefault();
+              if (!isRunning && !showPauseMenu) {
+                setIsRunning(true);
+              } else if (!isGameOver && !showPauseMenu && isRunning) {
+                const canvas = canvasRef.current;
+                if (canvas) {
+                  canvas.click();
+                }
+              } else if (isGameOver) {
+                setIsRunning(true);
               }
-            } else if (isGameOver) {
-              setIsRunning(true);
-            }
-          }}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold text-lg"
-        >
-          {!isRunning && !isGameOver ? '🐱 Start' : isGameOver ? '🔄 Restart' : '⬆️ Jump'}
-        </button>
+            }}
+            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-4 rounded-3xl font-bold text-lg shadow-xl border-2 border-white/30 transform active:scale-95 transition-all duration-300"
+          >
+            <div className="flex items-center justify-center gap-3">
+              {!isRunning && !isGameOver ? (
+                <>
+                  <Play className="w-6 h-6" />
+                  <span>Start Adventure</span>
+                </>
+              ) : isGameOver ? (
+                <>
+                  <RotateCcw className="w-6 h-6" />
+                  <span>Try Again</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-6 h-6 text-2xl">⬆️</div>
+                  <span>Jump!</span>
+                </>
+              )}
+            </div>
+          </button>
+        </div>
+
+        {/* Game Tips */}
+        <div className="mt-8 sm:mt-12 bg-gradient-to-r from-purple-100/70 to-pink-100/70 backdrop-blur-sm rounded-2xl p-4 sm:p-6 shadow-lg border border-purple-200 max-w-2xl mx-auto">
+          <h3 className="text-lg sm:text-xl font-bold text-purple-800 mb-3 text-center flex items-center justify-center gap-2">
+            <Star className="w-5 h-5 text-yellow-500" />
+            Pro Tips
+            <Star className="w-5 h-5 text-yellow-500" />
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm sm:text-base text-purple-700">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>Time your jumps perfectly</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+              <span>Speed increases over time</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+              <span>Watch for obstacle patterns</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span>Practice makes purr-fect!</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
